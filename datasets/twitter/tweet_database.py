@@ -1,0 +1,150 @@
+from zutils.dto.st.location import Location
+from zutils.dto.text.text_parser import TextParser
+from zutils.dto.text.word_dict import WordDict
+from tweet import Tweet
+from filters import EmptyMessageFilter
+import codecs
+from random import shuffle
+
+class TweetDatabase:
+
+    def __init__(self):
+        self.tweets = []
+
+    def load_raw_tweets_from_file(self, input_file):
+        cnt = 0
+        with codecs.open(input_file, 'r', 'utf-8') as fin:
+            for line in fin:
+                cnt += 1
+                if cnt % 10000 == 0:
+                    print 'Lines:', cnt, ' Tweets:', len(self.tweets)
+                try:
+                    tweet = Tweet()
+                    tweet.load_raw(line)
+                    self.tweets.append(tweet)
+                except:
+                    continue
+
+    def load_clean_tweets_from_file(self, input_file):
+        self.tweets = []
+        with codecs.open(input_file, 'r', 'utf-8') as fin:
+            for line in fin:
+                tweet = Tweet()
+                tweet.load_clean(line)
+                self.tweets.append(tweet)
+
+    def set_tweets(self, tweets):
+        self.tweets = tweets
+
+    def shuffle_tweets(self):
+        shuffle(self.tweets)
+
+    def add_tweet(self, tweet):
+        self.tweets.append(tweet)
+
+    def size(self):
+        return len(self.tweets)
+
+
+    def clean_timestamps(self):
+        for tweet in self.tweets:
+            tweet.timestamp.gen_timestamp()
+
+    def tokenize_message(self, preserve_types, ark_run_cmd, min_length=3):
+        print 'Begin tokenizing messages...'
+        tp = TextParser(min_length)
+        message_list = [t.message.raw_message for t in self.tweets]
+        word_lists = tp.parse_words_by_ark_nlp_batch(message_list, \
+                                                preserve_types, ark_run_cmd)
+        for i, words in enumerate(word_lists):
+            self.tweets[i].message.set_clean_words(words)
+        print 'Tokenization done.'
+
+
+    def trim_words_by_frequency(self, word_dict_file=None,
+            freq_threshold=500000, infreq_threshold=50):
+        wd = self.gen_word_dict(word_dict_file)
+        freq_words = wd.get_frequent_words(freq_threshold)
+        infreq_words = wd.get_infrequent_words(infreq_threshold)
+        stopwords = freq_words.union(infreq_words)
+        for tweet in self.tweets:
+            tweet.message.remove_stopwords(stopwords)
+
+    def gen_word_dict(self, output_file=None):
+        wd = WordDict()
+        for tweet in self.tweets:
+            wd.update(tweet.message.words)
+        word_cnt_list = wd.rank()
+        if output_file is not None:
+            with open(output_file, 'w') as fout:
+                for w, c in word_cnt_list:
+                    fout.write(str(c) + ',' + w + '\n')
+        return wd
+
+    def apply_filters(self, filters):
+        for f in filters:
+            self.apply_one_filter(f)
+
+    def apply_one_filter(self, custom_filter):
+        print 'Before filtering # tweets:', len(self.tweets)
+        filtered_tweets = []
+        for tweet in self.tweets:
+            if custom_filter.verify(tweet):
+                filtered_tweets.append(tweet)
+        self.tweets = filtered_tweets
+        print 'After filtering # tweets:', len(self.tweets)
+
+
+    def print_tweets(self):
+        for t in self.tweets:
+            print t.to_string(',')
+
+    def write_clean_tweets_to_file(self, output_file):
+        cnt = 0
+        with codecs.open(output_file, 'w', 'utf-8') as fout:
+            for tweet in self.tweets:
+                fout.write(tweet.to_string() + '\n')
+                cnt += 1
+                if cnt % 10000 == 0:
+                    print 'Finished writing %d clean tweets.' % cnt
+        print 'Finished dumping %d clean tweets.' % cnt
+
+
+    def calc_lat_range(self):
+        lats = [t.location.lat for t in self.tweets]
+        return min(lats), max(lats)
+
+
+    def calc_lng_range(self):
+        lngs = [t.location.lng for t in self.tweets]
+        return min(lngs), max(lngs)
+
+    def calc_time_range(self):
+        tmps = [t.timestamp.timestamp for t in self.tweets]
+        return min(tmps), max(tmps)
+
+
+if __name__ == '__main__':
+    input_dir = '/Users/chao/Dropbox/data/raw/'
+    output_dir = '/Users/chao/Dropbox/data/activity/'
+    raw_tweet_file = input_dir + 'ny_tweet_sample.txt'
+    word_dict_file = output_dir + 'word_dict.txt'
+    clean_tweet_file = output_dir + 'tweets.txt'
+    td = TweetDatabase()
+    # 1. load raw tweets
+    td.load_raw_tweets_from_file(raw_tweet_file)
+    # 2. clean timestamps
+    td.clean_timestamps()
+    # 3. tokenize messages using ark nlp
+    preserve_types = set(['N', '^', 'S', 'Z', 'V', 'A', 'R', '#'])
+    ark_run_cmd='java -XX:ParallelGCThreads=2 -Xmx2G -jar /Users/chao/Dropbox/code/lib/ark-tweet-nlp-0.3.2.jar'
+    td.tokenize_message(preserve_types, ark_run_cmd)
+    # 4. remove frequent and infrequent words
+    freq_thresh = 500000
+    infreq_thresh = 5
+    td.trim_words_by_frequency(word_dict_file, freq_thresh, infreq_thresh)
+    # 5. filter tweets
+    emf = EmptyMessageFilter()
+    td.apply_one_filter(emf)
+    # 6. write clean tweets
+    td.write_clean_tweets_to_file(clean_tweet_file)
