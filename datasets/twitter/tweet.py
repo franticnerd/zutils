@@ -21,7 +21,7 @@ class Tweet:
         self.uid = long(items[1])
         self.location = Location(float(items[2]), float(items[3]))
         self.timestamp = Timestamp(items[4])
-        self.timestamp.timestamp = long(items[5])
+        self.timestamp.timestamp = long(float(items[5]))
         self.message = Message(items[7])
         self.message.words = items[6].strip().split()
 

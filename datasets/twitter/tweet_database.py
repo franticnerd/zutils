@@ -1,10 +1,10 @@
-from zutils.dto.st.location import Location
 from zutils.dto.text.text_parser import TextParser
 from zutils.dto.text.word_dict import WordDict
 from tweet import Tweet
 from filters import EmptyMessageFilter
 import codecs
 from random import shuffle
+
 
 class TweetDatabase:
 
@@ -16,7 +16,7 @@ class TweetDatabase:
         with codecs.open(input_file, 'r', 'utf-8') as fin:
             for line in fin:
                 cnt += 1
-                if cnt % 10000 == 0:
+                if cnt % 20000 == 0:
                     print 'Lines:', cnt, ' Tweets:', len(self.tweets)
                 try:
                     tweet = Tweet()
@@ -44,6 +44,15 @@ class TweetDatabase:
 
     def size(self):
         return len(self.tweets)
+
+    def index(self):
+        self.indexed_tweets = {}
+        for tweet in self.tweets:
+            tweet_id = tweet.tid
+            self.indexed_tweets[tweet_id] = tweet
+
+    def get_tweet(self, tweet_id):
+        return self.indexed_tweets[tweet_id]
 
 
     def clean_timestamps(self):
@@ -73,12 +82,10 @@ class TweetDatabase:
     def gen_word_dict(self, output_file=None):
         wd = WordDict()
         for tweet in self.tweets:
-            wd.update(tweet.message.words)
-        word_cnt_list = wd.rank()
+            wd.update_count(tweet.message.words)
+        wd.encode_words()
         if output_file is not None:
-            with open(output_file, 'w') as fout:
-                for w, c in word_cnt_list:
-                    fout.write(str(c) + ',' + w + '\n')
+            wd.write_to_file(output_file)
         return wd
 
     def apply_filters(self, filters):
@@ -141,7 +148,7 @@ if __name__ == '__main__':
     td.tokenize_message(preserve_types, ark_run_cmd)
     # 4. remove frequent and infrequent words
     freq_thresh = 500000
-    infreq_thresh = 5
+    infreq_thresh = 50
     td.trim_words_by_frequency(word_dict_file, freq_thresh, infreq_thresh)
     # 5. filter tweets
     emf = EmptyMessageFilter()
