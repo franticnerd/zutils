@@ -1,0 +1,7 @@
+dir: /Users/chao/Dropbox/data/raw/sample_4sq_poi/
+
+min_lat: 34.2
+min_lng: -118.18
+max_lat: 34.25
+max_lng: -118.15
+num_bin_axis: 3

@@ -1,0 +1,7 @@
+dir: /shared/data/czhang82/raw/us_4sq_poi/
+
+min_lat: 24.396308
+min_lng: -124.848974
+max_lat: 49.384358
+max_lng: -66.885444
+num_bin_axis: 50

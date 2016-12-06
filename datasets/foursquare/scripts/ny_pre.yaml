@@ -1,0 +1,7 @@
+dir: /shared/data/czhang82/raw/ny_4sq_poi/
+
+min_lat: 40.5
+min_lng: -74.3
+max_lat: 40.95
+max_lng: -73.7
+num_bin_axis: 30
