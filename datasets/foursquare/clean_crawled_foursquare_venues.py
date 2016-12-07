@@ -1,5 +1,9 @@
 import json
+import sys
+from zutils.config.param_handler import yaml_loader
+import codecs
 
+# Step 1: load venues and clean them
 def load_venues(input_file):
     final_venues = {}
     with open(input_file, 'r') as fin:
@@ -13,7 +17,7 @@ def load_venues(input_file):
 # trim the venues by removing unnecessary fields
 def trim_venues(venues):
     ret = []
-    keys = ['id', 'name', 'location', 'categories', 'stats', 'description', 'tags']
+    keys = ['id', 'name', 'location', 'categories']
     for venue in venues:
         trimmed_venue = {}
         for k in keys:
@@ -30,14 +34,78 @@ def extend_venues(final_venues, venues):
             final_venues[vid] = v
 
 
+# Step 2: load category and build mapping, map low-level categories to the first level
+def build_category_map(category_file):
+    with open(category_file, 'r') as fin:
+        cat_obj = json.load(fin)
+    cat_map = {}
+    for c in cat_obj['categories']:
+        name = c['name']
+        map_sub_categories(cat_map, c, name)
+    return cat_map
+
+
+def map_sub_categories(cat_map, c, name):
+    cat_id = c['id']
+    cat_map[cat_id] = name
+    for sub_cat in c['categories']:
+        map_sub_categories(cat_map, sub_cat, name)
+
+# clean the venues
+def clean_venues(venues, cat_map):
+    ret = []
+    for v in venues.values():
+        try:
+            vid = v['id']
+            lat = str(v['location']['lat'])
+            lng = str(v['location']['lng'])
+            one_cat_id = v['categories'][0]['id']
+            cat = cat_map[one_cat_id]
+            check_category_consistency(v, cat_map, cat)
+            vname = v['name']
+            ret.append((vid, lat, lng, cat, vname))
+        except:
+            print "Error:", sys.exc_info()[0]
+            print json.dumps(v)
+            continue
+    return ret
+
+
+def check_category_consistency(v, cat_map, cat):
+    for subc in v['categories']:
+        subid = subc['id']
+        if cat_map[subid] != cat:
+            print 'Inconsistent categories', v
+
+
 def write_venues(venues, output_file):
-    with open(output_file, 'w') as fout:
-        for v in venues.values():
-            fout.write(json.dumps(v) + '\n')
+    with codecs.open(output_file, 'w', 'utf-8') as fout:
+        for v in venues:
+            fout.write(','.join(v) + '\n')
 
 
-input_file = '/Users/chao/Downloads/ny_4sq_venues/venues.txt'
-output_file = '/Users/chao/Downloads/ny_4sq_venues/clean_venues.txt'
-venues = load_venues(input_file)
-print len(venues)
-write_venues(venues, output_file)
+# def write_venues(venues, output_file):
+#     with open(output_file, 'w') as fout:
+#         for v in venues.values():
+#             fout.write(json.dumps(v) + '\n')
+
+
+if __name__ == '__main__':
+    # data_dir = '/Users/chao/Dropbox/data/raw/sample_4sq_poi/'
+    data_dir = '/Users/chao/Dropbox/data/raw/ny_4sq_poi/'
+    if len(sys.argv) > 1:
+        para_file = sys.argv[1]
+        para = yaml_loader().load(para_file)
+        data_dir = para['dir']
+    input_file = data_dir + 'raw_venues.txt'
+    output_file = data_dir + 'venues.txt'
+
+    category_file = data_dir + 'category.txt'
+    cat_map = build_category_map(category_file)
+    print cat_map
+
+    venues = load_venues(input_file)
+    venues = clean_venues(venues, cat_map)
+    print 'Number of final venues: ', len(venues)
+
+    write_venues(venues, output_file)
