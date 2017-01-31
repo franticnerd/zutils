@@ -23,7 +23,7 @@ class Tweet:
         self.timestamp = Timestamp(items[4])
         self.timestamp.timestamp = long(float(items[5]))
         self.message = Message(items[7])
-        self.message.words = items[6].strip().split()
+        self.message.words = items[6].strip().split(' ')
 
 
     def split_line(self, line, sep):
@@ -43,7 +43,8 @@ class Tweet:
                 str(self.timestamp.time_string),
                 str(self.timestamp.timestamp),
                 str(' '.join(self.message.words)),
-                self.message.raw_message]
+                str(self.message.raw_message.encode('utf-8'))]
+                # str(self.message.raw_message.encode('ascii', 'ignore'))]
         return sep.join(data)
 
 

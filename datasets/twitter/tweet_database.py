@@ -4,7 +4,10 @@ from tweet import Tweet
 from filters import EmptyMessageFilter
 import codecs
 from random import shuffle
+import sys
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 class TweetDatabase:
 
