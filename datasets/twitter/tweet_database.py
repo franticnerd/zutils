@@ -70,6 +70,9 @@ class TweetDatabase:
                 seen_tweet_ids.add(tweet.tid)
         self.tweets = new_tweets
 
+    def sort_by_time(self):
+        self.tweets.sort(key=lambda x: x.timestamp.timestamp, reverse=False)
+
 
     def clean_timestamps(self):
         for tweet in self.tweets:
