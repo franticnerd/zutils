@@ -33,6 +33,9 @@ class TweetDatabase:
                 tweet.load_clean(line)
                 self.tweets.append(tweet)
 
+    def get_tweet_ids(self):
+        return [tweet.tid for tweet in self.tweets]
+
     def set_tweets(self, tweets):
         self.tweets = tweets
 
@@ -53,6 +56,16 @@ class TweetDatabase:
 
     def get_tweet(self, tweet_id):
         return self.indexed_tweets[tweet_id]
+
+
+    def dedup(self):
+        new_tweets = []
+        seen_tweet_ids = set()
+        for tweet in self.tweets:
+            if tweet.tid not in seen_tweet_ids:
+                new_tweets.append(tweet)
+                seen_tweet_ids.add(tweet.tid)
+        self.tweets = new_tweets
 
 
     def clean_timestamps(self):
