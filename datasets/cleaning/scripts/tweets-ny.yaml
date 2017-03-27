@@ -1,0 +1,17 @@
+raw_tweet_file: /shared/data/czhang82/source/tweets-ny/raw/tweets.txt
+clean_tweet_file: /shared/data/czhang82/source/tweets-ny/clean/tweets-clean.txt
+word_dict_file: /shared/data/czhang82/source/tweets-ny/clean/word-frequency.txt
+
+message_file: /shared/data/czhang82/source/tweets-ny/clean/messages.txt
+
+pos_tag_file: /shared/data/czhang82/source/tweets-ny/clean/pos-tags.txt
+ark_run_cmd: java -XX:ParallelGCThreads=2 -Xmx10G -jar /home/czhang82/code/lib/ark-tweet-nlp-0.3.2.jar
+
+downsample_tweet_file: /shared/data/czhang82/source/tweets-ny/clean/tweets-downsample.txt
+downsample_size: 10000
+
+activity_tweet_file: /shared/data/czhang82/source/tweets-ny/clean/tweets-activity.txt
+word_entropy_file: /shared/data/czhang82/source/tweets-ny/clean/word-entropy.txt
+activity_word_ratio: 0.05
+grid_bin_list: [50, 50, 150]
+
