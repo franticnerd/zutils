@@ -14,7 +14,8 @@ class Message:
                                                 preserve_types, ark_run_cmd)
 
     def set_clean_words(self, clean_words):
-        self.words = list(set(clean_words))
+        # self.words = list(set(clean_words))
+        self.words = clean_words
 
     def remove_stopwords(self, stopword_set):
         trimed_words = []

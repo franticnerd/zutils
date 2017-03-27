@@ -84,6 +84,10 @@ class TextParser:
             ret.append(words)
         return ret
 
+    # Use ark_tweet_nlp to parse a set of raw tweet messages and return all tags
+    def get_pos_tag_lists(self, tweets, ark_run_cmd):
+        token_lists = CMUTweetTagger.runtagger_parse(tweets, run_tagger_cmd=ark_run_cmd)
+        return token_lists
 
 if __name__ == '__main__':
     s1 = 'hello, 13423, This is @ZC went octopi a test for 12you!. Try it http://'

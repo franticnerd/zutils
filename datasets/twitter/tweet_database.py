@@ -5,6 +5,7 @@ from filters import EmptyMessageFilter
 import codecs
 from random import shuffle
 import sys
+import random
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -78,25 +79,51 @@ class TweetDatabase:
         for tweet in self.tweets:
             tweet.timestamp.gen_timestamp()
 
-    def tokenize_message(self, preserve_types, ark_run_cmd, min_length=3):
+
+    def tokenize_message(self, preserve_types=None, ark_run_cmd=None, min_length=3):
         print 'Begin tokenizing messages...'
         tp = TextParser(min_length)
-        message_list = [t.message.raw_message for t in self.tweets]
-        word_lists = tp.parse_words_by_ark_nlp_batch(message_list, \
-                                                preserve_types, ark_run_cmd)
-        for i, words in enumerate(word_lists):
-            self.tweets[i].message.set_clean_words(words)
+        if preserve_types is not None and ark_run_cmd is not None:
+            self.tokenize_pos(tp, preserve_types, ark_run_cmd)
+        else:
+            self.tokenize_plain(tp)
         print 'Tokenization done.'
 
 
+    # tokenize the message into unigrams
+    def tokenize_plain(self, tp):
+        for t in self.tweets:
+            words = tp.parse_words(t.message.raw_message, stem=True)
+            t.message.set_clean_words(words)
+
+
+    # tokenize the message with the TweetNLP tool
+    def tokenize_pos(self, tp, preserve_types, ark_run_cmd):
+        message_list = [t.message.raw_message for t in self.tweets]
+        word_lists = tp.parse_words_by_ark_nlp_batch(message_list, \
+                                                     preserve_types, ark_run_cmd)
+        for i, words in enumerate(word_lists):
+            self.tweets[i].message.set_clean_words(words)
+
+
+    def get_pos_tags(self, ark_run_cmd=None, min_length=3):
+        print 'Begin pos-tagging messages...'
+        tp = TextParser(min_length)
+        message_list = [t.message.raw_message for t in self.tweets]
+        pos_tag_lists = tp.get_pos_tag_lists(message_list, ark_run_cmd)
+        print 'Pos-tagging done.'
+        return pos_tag_lists
+
+
     def trim_words_by_frequency(self, word_dict_file=None,
-            freq_threshold=500000, infreq_threshold=50):
+            freq_threshold=500000, infreq_threshold=10):
         wd = self.gen_word_dict(word_dict_file)
         freq_words = wd.get_frequent_words(freq_threshold)
         infreq_words = wd.get_infrequent_words(infreq_threshold)
         stopwords = freq_words.union(infreq_words)
         for tweet in self.tweets:
             tweet.message.remove_stopwords(stopwords)
+
 
     def gen_word_dict(self, output_file=None):
         wd = WordDict()
@@ -106,6 +133,7 @@ class TweetDatabase:
         if output_file is not None:
             wd.write_to_file(output_file)
         return wd
+
 
     def apply_filters(self, filters):
         for f in filters:
@@ -136,6 +164,17 @@ class TweetDatabase:
         print 'Finished dumping %d clean tweets.' % cnt
 
 
+    def dump_messages(self, message_file):
+        cnt = 0
+        with codecs.open(message_file, 'w', 'utf-8') as fout:
+            for tweet in self.tweets:
+                fout.write(tweet.message.raw_message + '\n')
+                cnt += 1
+                if cnt % 10000 == 0:
+                    print 'Finished dumping messages for %d clean tweets.' % cnt
+        print 'Finished dumping messages for %d clean tweets.' % cnt
+
+
     def calc_lat_range(self):
         lats = [t.location.lat for t in self.tweets]
         return min(lats), max(lats)
@@ -148,6 +187,13 @@ class TweetDatabase:
     def calc_time_range(self):
         tmps = [t.timestamp.timestamp for t in self.tweets]
         return min(tmps), max(tmps)
+
+    def downsample(self, num=10000):
+        random.seed(100)
+        l = self.tweets
+        limit = min(num, len(l))
+        rand_smpl = [l[i] for i in sorted(random.sample(xrange(len(l)), limit))]
+        self.tweets = rand_smpl
 
 
 if __name__ == '__main__':
