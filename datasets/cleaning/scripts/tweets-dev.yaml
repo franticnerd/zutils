@@ -1,0 +1,17 @@
+raw_tweet_file: /Users/chao/data/source/tweets-dev/raw/tweets.txt
+clean_tweet_file: /Users/chao/data/source/tweets-dev/clean/tweets-clean.txt
+word_dict_file: /Users/chao/data/source/tweets-dev/clean/word-frequency.txt
+
+message_file: /Users/chao/data/source/tweets-dev/clean/messages.txt
+
+pos_tag_file: /Users/chao/data/source/tweets-dev/clean/pos-tags.txt
+ark_run_cmd: 'java -XX:ParallelGCThreads=2 -Xmx2G -jar /Users/chao/Dropbox/code/lib/ark-tweet-nlp-0.3.2.jar'
+
+downsample_tweet_file: /Users/chao/data/source/tweets-dev/clean/tweets-downsample.txt
+downsample_size: 100
+
+activity_tweet_file: /Users/chao/data/source/tweets-dev/clean/tweets-activity.txt
+word_entropy_file: /Users/chao/data/source/tweets-dev/clean/word-entropy.txt
+activity_word_ratio: 0.2
+grid_bin_list: [50, 50, 150]
+
