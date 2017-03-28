@@ -1,0 +1,15 @@
+dataset_type: checkin
+
+raw_venue_file: /Users/chao/data/source/checkins-dev/raw/venues.csv
+raw_tweet_file: /Users/chao/data/source/checkins-dev/raw/checkins.csv
+clean_tweet_file: /Users/chao/data/source/checkins-dev/clean/tweets-clean.txt
+word_dict_file: /Users/chao/data/source/checkins-dev/clean/word-frequency.txt
+
+message_file: /Users/chao/data/source/checkins-dev/clean/messages.txt
+
+pos_tag_file: /Users/chao/data/source/checkins-dev/clean/pos-tags.txt
+ark_run_cmd: 'java -XX:ParallelGCThreads=2 -Xmx2G -jar /Users/chao/Dropbox/code/lib/ark-tweet-nlp-0.3.2.jar'
+
+trajectory_file: /Users/chao/data/source/checkins-dev/clean/trajectories.txt
+dense_trajectory_file: /Users/chao/data/source/checkins-dev/clean/trajectories-dense.txt
+max_gap: 3600

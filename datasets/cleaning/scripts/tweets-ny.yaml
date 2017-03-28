@@ -15,3 +15,7 @@ word_entropy_file: /shared/data/czhang82/source/tweets-ny/clean/word-entropy.txt
 activity_word_ratio: 0.05
 grid_bin_list: [50, 50, 150]
 
+trajectory_file: /shared/data/czhang82/source/tweets-ny/clean/trajectories.txt
+dense_trajectory_file: /shared/data/czhang82/source/tweets-ny/clean/trajectories-dense.txt
+max_gap: 10800
+dataset_type: tweet

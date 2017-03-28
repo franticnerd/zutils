@@ -15,3 +15,8 @@ word_entropy_file: /Users/chao/data/source/tweets-dev/clean/word-entropy.txt
 activity_word_ratio: 0.2
 grid_bin_list: [50, 50, 150]
 
+trajectory_file: /Users/chao/data/source/tweets-dev/clean/trajectories.txt
+dense_trajectory_file: /Users/chao/data/source/tweets-dev/clean/trajectories-dense.txt
+max_gap: 3600
+dataset_type: tweet
+

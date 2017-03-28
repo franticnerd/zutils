@@ -1,6 +1,6 @@
-from zutils.datasets.twitter.tweet_database import TweetDatabase
+from zutils.datasets.twitter.filters import EmptyCategoryFilter
 from zutils.datasets.twitter.filters import EmptyMessageFilter
-from zutils.config.param_handler import yaml_loader
+from data_loader import load_raw_tweets, load_venues, load_params
 import sys
 
 '''
@@ -12,11 +12,6 @@ import sys
 6. Write clean tweets to file
 '''
 
-
-def load_raw_tweets(raw_tweet_file):
-    td = TweetDatabase()
-    td.load_raw_tweets_from_file(raw_tweet_file)
-    return td
 
 def clean_tweets(td, word_dict_file):
     print 'Number of raw tweets:', td.size()
@@ -31,25 +26,25 @@ def clean_tweets(td, word_dict_file):
     td.sort_by_time()
 
 
-def run(raw_tweet_file, word_dict_file, clean_tweet_file):
-    td = load_raw_tweets(raw_tweet_file)
+def join_with_venues(td, vd):
+    # for checkin datasets: join with the venue database to clean category information
+    td.join_venue_database(vd)
+    ecf = EmptyCategoryFilter()
+    td.apply_one_filter(ecf)
+
+
+
+def run(raw_tweet_file, word_dict_file, clean_tweet_file, dataset_type, raw_venue_file):
+    td = load_raw_tweets(raw_tweet_file, dataset_type)
     clean_tweets(td, word_dict_file)
-    # td.downsample(100)
+    if dataset_type == 'checkin':
+        vd = load_venues(raw_venue_file)
+        join_with_venues(td, vd)
     td.write_clean_tweets_to_file(clean_tweet_file)
 
-if __name__ == '__main__':
 
-    raw_tweet_file = '/Users/chao/data/source/tweets-dev/raw/tweets.txt'
-    clean_tweet_file = '/Users/chao/data/source/tweets-dev/clean/tweets-clean.txt'
-    word_dict_file = '/Users/chao/data/source/tweets-dev/clean/words.txt'
 
-    if len(sys.argv) > 1:
-        para_file = sys.argv[1]
-        para = yaml_loader().load(para_file)
-        raw_tweet_file = para['raw_tweet_file']
-        clean_tweet_file = para['clean_tweet_file']
-        word_dict_file = para['word_dict_file']
-
-    run(raw_tweet_file, word_dict_file, clean_tweet_file)
-
+para_file = None if len(sys.argv) <= 1 else sys.argv[1]
+p = load_params(para_file)
+run(p['raw_tweet_file'], p['word_dict_file'], p['clean_tweet_file'], p['dataset_type'], p['raw_venue_file'])
 

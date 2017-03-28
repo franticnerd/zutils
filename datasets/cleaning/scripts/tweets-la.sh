@@ -14,3 +14,9 @@ python '../pos-tagging.py' $para_file
 
 # extract activity tweets
 python '../extract_activity_tweets.py' $para_file
+
+# extract trajectories
+python '../extract_trajectories.py' $para_file
+
+# extract dense trajectories
+python '../extract_dense_trajectories.py' $para_file

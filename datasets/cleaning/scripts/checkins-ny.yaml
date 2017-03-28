@@ -1,0 +1,10 @@
+
+raw_venue_file: /Users/chao/data/source/checkins-ny/raw/venues.csv
+raw_tweet_file: /Users/chao/data/source/checkins-ny/raw/checkins.csv
+clean_tweet_file: /Users/chao/data/source/checkins-ny/clean/tweets-clean.txt
+word_dict_file: /Users/chao/data/source/checkins-ny/clean/word-frequency.txt
+
+message_file: /Users/chao/data/source/checkins-ny/clean/messages.txt
+
+pos_tag_file: /Users/chao/data/source/checkins-ny/clean/pos-tags.txt
+ark_run_cmd: 'java -XX:ParallelGCThreads=2 -Xmx2G -jar /Users/chao/Dropbox/code/lib/ark-tweet-nlp-0.3.2.jar'
