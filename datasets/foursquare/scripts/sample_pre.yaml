@@ -1,4 +1,6 @@
-dir: /Users/chao/Dropbox/data/raw/sample_4sq_poi/
+raw_venue_file: /Users/chao/data/source/pois-dev/raw/venues.txt
+category_file: /Users/chao/data/source/pois-dev/raw/category.txt
+clean_venue_file: /Users/chao/data/source/pois-dev/clean/venues.txt
 
 min_lat: 34.2
 min_lng: -118.18

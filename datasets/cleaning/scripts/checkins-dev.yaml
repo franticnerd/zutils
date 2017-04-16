@@ -1,15 +1,21 @@
 dataset_type: checkin
 
-raw_venue_file: /Users/chao/data/source/checkins-dev/raw/venues.csv
-raw_tweet_file: /Users/chao/data/source/checkins-dev/raw/checkins.csv
-clean_tweet_file: /Users/chao/data/source/checkins-dev/clean/tweets-clean.txt
-word_dict_file: /Users/chao/data/source/checkins-dev/clean/word-frequency.txt
+data_dir: &DIR /Users/chao/data/source/checkins-dev/
 
-message_file: /Users/chao/data/source/checkins-dev/clean/messages.txt
+raw_venue_file: !join [*DIR, raw/venues.csv]
+raw_tweet_file: !join [*DIR, raw/checkins.csv]
+clean_tweet_file: !join [*DIR, clean/checkins.txt]
+clean_venue_file: !join [*DIR, clean/venues.txt]
+word_dict_file: !join [*DIR, clean/words.txt]
+freq_thresh: 100000
+infreq_thresh: 5
 
-pos_tag_file: /Users/chao/data/source/checkins-dev/clean/pos-tags.txt
+message_file: !join [*DIR, clean/messages.txt]
+
+pos_tag_file:  !join [*DIR, clean/postags.txt]
 ark_run_cmd: 'java -XX:ParallelGCThreads=2 -Xmx2G -jar /Users/chao/Dropbox/code/lib/ark-tweet-nlp-0.3.2.jar'
 
-trajectory_file: /Users/chao/data/source/checkins-dev/clean/trajectories.txt
-dense_trajectory_file: /Users/chao/data/source/checkins-dev/clean/trajectories-dense.txt
+
+trajectory_file: !join [*DIR, clean/trajectories.txt]
+dense_trajectory_file: !join [*DIR, clean/trajectories-dense.txt]
 max_gap: 3600

@@ -46,8 +46,11 @@ def set_default_params():
     para = {}
     para['dataset_type'] = 'tweet'
     para['raw_tweet_file'] = '/Users/chao/data/source/tweets-dev/raw/tweets.txt'
-    para['raw_venue_file'] = None
+    para['raw_venue_file'] = '/Users/chao/data/source/tweets-dev/raw/tweets.txt'
     para['clean_tweet_file'] = '/Users/chao/data/source/tweets-dev/clean/tweets-clean.txt'
+    para['clean_entity_file'] = '/Users/chao/data/source/tweets-dev/clean/entities.txt'
+    para['freq_thresh'] = 500
+    para['infreq_thresh'] = 10
     para['word_dict_file'] = '/Users/chao/data/source/tweets-dev/clean/words.txt'
     para['downsample_tweet_file'] = '/Users/chao/data/source/tweets-dev/clean/tweets-downsample.txt'
     para['downsample_size'] = 10

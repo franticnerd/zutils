@@ -1,6 +1,4 @@
-#!/usr/bin/env bash
-
-para_file='./tweets-ny.yaml'
+para_file='./sample-tweets-100k.yaml'
 
 # clean tweets
 python '../extract_clean_tweets.py' $para_file

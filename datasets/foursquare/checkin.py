@@ -26,10 +26,11 @@ class Checkin(Tweet):
         self.uid = long(items[1])
         self.location = Location(float(items[2]), float(items[3]))
         self.timestamp = Timestamp(items[4])
-        self.timestamp.timestamp = long(items[5])
-        self.category = items[6]
-        self.message = Message(items[8])
-        self.message.words = items[7].split()
+        self.timestamp.timestamp = long(float(items[5]))
+        self.message = Message(items[7])
+        self.message.words = items[6].split()
+        self.vid = items[8]
+
 
 
     def join_with_venue(self, venue_database):
@@ -48,9 +49,11 @@ class Checkin(Tweet):
                 str(self.location.lng),
                 str(self.timestamp.time_string),
                 str(self.timestamp.timestamp),
-                self.category,
                 str(' '.join(self.message.words)),
-                self.message.raw_message]
+                self.message.raw_message,
+                str(self.vid)
+                # self.category
+                ]
         return sep.join(data)
 
 

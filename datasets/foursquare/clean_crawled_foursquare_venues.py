@@ -84,28 +84,22 @@ def write_venues(venues, output_file):
             fout.write(','.join(v) + '\n')
 
 
-# def write_venues(venues, output_file):
-#     with open(output_file, 'w') as fout:
-#         for v in venues.values():
-#             fout.write(json.dumps(v) + '\n')
-
-
 if __name__ == '__main__':
     # data_dir = '/Users/chao/Dropbox/data/raw/sample_4sq_poi/'
-    data_dir = '/Users/chao/Dropbox/data/raw/ny_4sq_poi/'
+    raw_venue_file = '/Users/chao/data/source/pois-dev/raw/venues.txt'
+    category_file = '/Users/chao/data/source/pois-dev/raw/category.txt'
+    clean_venue_file = '/Users/chao/data/source/pois-dev/clean/venues.txt'
     if len(sys.argv) > 1:
         para_file = sys.argv[1]
         para = yaml_loader().load(para_file)
-        data_dir = para['dir']
-    input_file = data_dir + 'raw_venues.txt'
-    output_file = data_dir + 'venues.txt'
+        raw_venue_file = para['raw_venue_file']
+        category_file = para['category_file']
+        clean_venue_file = para['clean_venue_file']
 
-    category_file = data_dir + 'category.txt'
     cat_map = build_category_map(category_file)
-    print cat_map
+    # print cat_map
 
-    venues = load_venues(input_file)
+    venues = load_venues(raw_venue_file)
     venues = clean_venues(venues, cat_map)
     print 'Number of final venues: ', len(venues)
-
-    write_venues(venues, output_file)
+    write_venues(venues, clean_venue_file)

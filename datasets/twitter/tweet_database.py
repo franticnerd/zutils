@@ -116,7 +116,7 @@ class TweetDatabase:
 
 
     def trim_words_by_frequency(self, word_dict_file=None,
-            freq_threshold=500000, infreq_threshold=100):
+            freq_threshold=500000, infreq_threshold=1):
         wd = self.gen_word_dict(word_dict_file)
         freq_words = wd.get_frequent_words(freq_threshold)
         infreq_words = wd.get_infrequent_words(infreq_threshold)
@@ -194,6 +194,15 @@ class TweetDatabase:
         limit = min(num, len(l))
         rand_smpl = [l[i] for i in sorted(random.sample(xrange(len(l)), limit))]
         self.tweets = rand_smpl
+
+    # split the database into two
+    def split(self, train_ratio):
+        train_data_size = int(len(self.tweets) * train_ratio)
+        train_db, test_db = TweetDatabase(), TweetDatabase()
+        train_db.tweets = self.tweets[:train_data_size]
+        test_db.tweets = self.tweets[train_data_size:]
+        return train_db, test_db
+
 
 
 if __name__ == '__main__':

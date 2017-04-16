@@ -1,4 +1,6 @@
-dir: /shared/data/czhang82/raw/us_4sq_poi/
+raw_venue_file: /shared/data/czhang82/source/pois-us/raw/venues.txt
+category_file: /shared/data/czhang82/source/pois-us/raw/category.txt
+clean_venue_file: /shared/data/czhang82/source/pois-us/clean/venues.txt
 
 min_lat: 24.396308
 min_lng: -124.848974

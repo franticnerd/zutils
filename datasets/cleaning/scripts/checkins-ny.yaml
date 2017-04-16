@@ -1,10 +1,19 @@
+dataset_type: checkin
 
-raw_venue_file: /Users/chao/data/source/checkins-ny/raw/venues.csv
-raw_tweet_file: /Users/chao/data/source/checkins-ny/raw/checkins.csv
-clean_tweet_file: /Users/chao/data/source/checkins-ny/clean/tweets-clean.txt
-word_dict_file: /Users/chao/data/source/checkins-ny/clean/word-frequency.txt
+data_dir: &DIR /shared/data/czhang82/source/checkins-ny/
+raw_venue_file: !join [*DIR, raw/venues.csv]
+raw_tweet_file: !join [*DIR, raw/checkins.csv]
+clean_tweet_file: !join [*DIR, clean/checkins.txt]
+clean_venue_file: !join [*DIR, clean/venues.txt]
+word_dict_file: !join [*DIR, clean/words.txt]
+freq_thresh: 100000
+infreq_thresh: 50
 
-message_file: /Users/chao/data/source/checkins-ny/clean/messages.txt
+message_file: !join [*DIR, clean/messages.txt]
 
-pos_tag_file: /Users/chao/data/source/checkins-ny/clean/pos-tags.txt
-ark_run_cmd: 'java -XX:ParallelGCThreads=2 -Xmx2G -jar /Users/chao/Dropbox/code/lib/ark-tweet-nlp-0.3.2.jar'
+pos_tag_file:  !join [*DIR, clean/postags.txt]
+ark_run_cmd: 'java -XX:ParallelGCThreads=2 -Xmx2G -jar /home/czhang82/code/lib/ark-tweet-nlp-0.3.2.jar'
+
+trajectory_file: !join [*DIR, clean/trajectories.txt]
+dense_trajectory_file: !join [*DIR, clean/trajectories-dense.txt]
+max_gap: 3600

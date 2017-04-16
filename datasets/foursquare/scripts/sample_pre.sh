@@ -1,2 +1,3 @@
 para_file='./sample_pre.yaml'
-python '../foursquare_crawler.py' $para_file
+# python '../foursquare_crawler.py' $para_file
+python '../clean_crawled_foursquare_venues.py' $para_file
