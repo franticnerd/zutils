@@ -2,6 +2,7 @@
 .AppleDouble
 .LSOverride
 .ropeproject
+.idea
 
 __pycache__/
 *.py[cod]
