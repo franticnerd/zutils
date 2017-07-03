@@ -1,0 +1,24 @@
+dataset_type: tweet
+data_dir: &DIR /shared/data/czhang82/source/sample-tweets-1m/
+raw_tweet_file: !join [*DIR, raw/tweets.txt]
+clean_tweet_file: !join [*DIR, clean/tweets.txt]
+word_dict_file: !join [*DIR, clean/words.txt]
+freq_thresh: 100000
+infreq_thresh: 50
+
+message_file: !join [*DIR, clean/messages.txt]
+
+pos_tag_file: !join [*DIR, clean/postags.txt]
+ark_run_cmd: java -XX:ParallelGCThreads=2 -Xmx10G -jar /home/czhang82/code/lib/ark-tweet-nlp-0.3.2.jar
+
+downsample_tweet_file: !join [*DIR, clean/sample-tweets.txt]
+downsample_size: 10000
+
+activity_tweet_file: !join [*DIR, clean/tweets-activity.txt]
+word_entropy_file:  !join [*DIR, clean/word-entropy.txt]
+activity_word_ratio: 0.05
+grid_bin_list: [50, 50, 150]
+
+trajectory_file: !join [*DIR, clean/trajectories.txt]
+dense_trajectory_file:  !join [*DIR, clean/trajectories-dense.txt]
+max_gap: 10800
