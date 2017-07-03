@@ -1,7 +1,7 @@
 from zutils.dto.text.text_parser import TextParser
 from zutils.dto.text.word_dict import WordDict
+from zutils.dto.st.grid import GridSpace
 from tweet import Tweet
-from filters import EmptyMessageFilter
 import codecs
 from random import shuffle
 import sys
@@ -125,11 +125,11 @@ class TweetDatabase:
             tweet.message.remove_stopwords(stopwords)
 
 
-    def gen_word_dict(self, output_file=None):
+    def gen_word_dict(self, min_freq=1, output_file=None):
         wd = WordDict()
         for tweet in self.tweets:
             wd.update_count(tweet.message.words)
-        wd.encode_words()
+        wd.encode_words(min_freq)
         if output_file is not None:
             wd.write_to_file(output_file)
         return wd
@@ -179,7 +179,6 @@ class TweetDatabase:
         lats = [t.location.lat for t in self.tweets]
         return min(lats), max(lats)
 
-
     def calc_lng_range(self):
         lngs = [t.location.lng for t in self.tweets]
         return min(lngs), max(lngs)
@@ -195,6 +194,7 @@ class TweetDatabase:
         rand_smpl = [l[i] for i in sorted(random.sample(xrange(len(l)), limit))]
         self.tweets = rand_smpl
 
+
     # split the database into two
     def split(self, train_ratio):
         train_data_size = int(len(self.tweets) * train_ratio)
@@ -204,28 +204,55 @@ class TweetDatabase:
         return train_db, test_db
 
 
+    # discretize the location
+    def gen_spatial_grid(self, n_bin_list, min_freq=1):
+        min_lat, max_lat = self.calc_lat_range()
+        min_lng, max_lng = self.calc_lng_range()
+        ranges = [(min_lat, max_lat), (min_lng, max_lng)]
+        spatial_grid = GridSpace(ranges, n_bin_list)
+        points = [[t.location.lat, t.location.lng] for t in self.tweets]
+        spatial_grid.encode_cells(points, min_freq)
+        return spatial_grid
+
+
+    # def convert_location_to_grid_id(self):
+    #     for tweet in self.tweets:
+    #         location = tweet.location
+    #         lat, lng = location.get_lat(), location.get_lng()
+    #         grid_id = self.location_grid.get_grid_id((lat, lng))
+    #         location.set_grid_id(grid_id)
+
+
+
 
 if __name__ == '__main__':
-    input_dir = '/Users/chao/Dropbox/data/raw/'
-    output_dir = '/Users/chao/Dropbox/data/activity/'
-    raw_tweet_file = input_dir + 'ny_tweet_sample.txt'
-    word_dict_file = output_dir + 'word_dict.txt'
-    clean_tweet_file = output_dir + 'tweets.txt'
+    # input_dir = '/Users/chao/Dropbox/data/raw/'
+    # output_dir = '/Users/chao/Dropbox/data/activity/'
+    # raw_tweet_file = input_dir + 'ny_tweet_sample.txt'
+    # word_dict_file = output_dir + 'word_dict.txt'
+    # clean_tweet_file = output_dir + 'tweets.txt'
+    # td = TweetDatabase()
+    # # 1. load raw tweets
+    # td.load_raw_tweets_from_file(raw_tweet_file)
+    # # 2. clean timestamps
+    # td.clean_timestamps()
+    # # 3. tokenize messages using ark nlp
+    # preserve_types = set(['N', '^', 'S', 'Z', 'V', 'A', 'R', '#'])
+    # ark_run_cmd='java -XX:ParallelGCThreads=2 -Xmx2G -jar /Users/chao/Dropbox/code/lib/ark-tweet-nlp-0.3.2.jar'
+    # td.tokenize_message(preserve_types, ark_run_cmd)
+    # # 4. remove frequent and infrequent words
+    # freq_thresh = 500000
+    # infreq_thresh = 50
+    # td.trim_words_by_frequency(word_dict_file, freq_thresh, infreq_thresh)
+    # # 5. filter tweets
+    # emf = EmptyMessageFilter()
+    # td.apply_one_filter(emf)
+    # # 6. write clean tweets
+    # td.write_clean_tweets_to_file(clean_tweet_file)
+    # test space grid
+    clean_tweet_file = '/Users/chao/data/source/tweets-dev/clean/tweets.txt'
+    grid_file = '/Users/chao/data/source/tweets-dev/clean/spatial-grid.txt'
     td = TweetDatabase()
-    # 1. load raw tweets
-    td.load_raw_tweets_from_file(raw_tweet_file)
-    # 2. clean timestamps
-    td.clean_timestamps()
-    # 3. tokenize messages using ark nlp
-    preserve_types = set(['N', '^', 'S', 'Z', 'V', 'A', 'R', '#'])
-    ark_run_cmd='java -XX:ParallelGCThreads=2 -Xmx2G -jar /Users/chao/Dropbox/code/lib/ark-tweet-nlp-0.3.2.jar'
-    td.tokenize_message(preserve_types, ark_run_cmd)
-    # 4. remove frequent and infrequent words
-    freq_thresh = 500000
-    infreq_thresh = 50
-    td.trim_words_by_frequency(word_dict_file, freq_thresh, infreq_thresh)
-    # 5. filter tweets
-    emf = EmptyMessageFilter()
-    td.apply_one_filter(emf)
-    # 6. write clean tweets
-    td.write_clean_tweets_to_file(clean_tweet_file)
+    td.load_clean_tweets_from_file(clean_tweet_file)
+    td.discretize_location([100, 100])
+    td.write_locaton_grid_to_file(grid_file)
