@@ -74,7 +74,7 @@ class WordEntropyProcessor:
         for tweet_index in tweet_indices:
             t = self.td.tweets[tweet_index]
             # print tweet_index, t
-            dim = grid.get_grid_id([t.location.lat, t.location.lng, t.timestamp.timestamp])
+            dim = grid.get_raw_cell_id([t.location.lat, t.location.lng, t.timestamp.timestamp])
             dist.add_value(dim, tweet_index)
         return dist
 

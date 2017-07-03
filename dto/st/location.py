@@ -11,6 +11,10 @@ class Location:
     def get_lng(self):
         return self.lng
 
+    # set the id of the location
+    def set_grid_id(self, grid_id):
+        self.grid_id = grid_id
+
     def euclidean_dist(self, l):
         diff_lat = self.lat - l.lat
         diff_lng = self.lng - l.lng

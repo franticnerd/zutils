@@ -1,4 +1,5 @@
 from random import randint
+import os
 
 # generate a combinations of the elements in list x, including empty sets
 def combine(x):
@@ -27,3 +28,30 @@ def rand_select(x, k):
         last_pos -= 1
     return y[-k:]
 
+
+# convert a list into a string
+def format_list_to_string(l, sep='\t'):
+    ret = []
+    for e in l:
+        if type(e) == float:
+            ret.append(format_float_to_string(e))
+        elif type(e) == list:
+            ret.append(format_list_to_string(e, ' '))
+        else:
+            ret.append(str(e))
+    return sep.join(ret)
+
+
+def format_float_to_string(f):
+    return str.format('{0:.4f}', f)
+
+
+# ensure the path for the output file exist
+def ensure_directory_exist(file_name):
+    directory = os.path.dirname(file_name)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+
+# print ensure_directory_exist('/Users/chao/Downloads/test34/2/hello.txt')
+# print format_list_to_string([2.35, 2, [3, 4]])
