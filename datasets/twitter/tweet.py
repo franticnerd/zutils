@@ -1,3 +1,4 @@
+import sys
 from zutils.dto.st.location import Location
 from zutils.dto.st.timestamp import Timestamp
 from zutils.dto.text.message import Message
@@ -17,13 +18,18 @@ class Tweet:
 
     def load_clean(self, line, sep='\x01'):
         items = self.split_line(line, sep)
-        self.tid = long(items[0])
-        self.uid = long(items[1])
-        self.location = Location(float(items[2]), float(items[3]))
-        self.timestamp = Timestamp(items[4])
-        self.timestamp.timestamp = long(float(items[5]))
-        self.message = Message(items[7])
-        self.message.words = items[6].strip().split(' ')
+        try:
+            self.tid = long(items[0])
+            self.uid = long(items[1])
+            self.location = Location(float(items[2]), float(items[3]))
+            self.timestamp = Timestamp(items[4])
+            self.timestamp.timestamp = long(float(items[5]))
+            self.message = Message(items[7])
+            self.message.words = items[6].strip().split(' ')
+        except:
+            print 'Error when loading clean tweets'
+            print line
+            sys.exit(0)
 
 
     def split_line(self, line, sep):
