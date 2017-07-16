@@ -31,7 +31,8 @@ class TweetDatabase:
 
     def load_clean_tweets_from_file(self, input_file):
         self.tweets = []
-        with codecs.open(input_file, 'r', 'utf-8') as fin:
+        # with codecs.open(input_file, 'r', 'utf-8') as fin:
+        with open(input_file, 'r') as fin:
             for line in fin:
                 tweet = Tweet()
                 tweet.load_clean(line)
