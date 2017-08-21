@@ -32,7 +32,7 @@ class PosDatabase:
             for line in fin:
                 fields = line.strip().split()
                 tweet_id, entities = long(fields[0]), fields[1:]
-                self.wd[tweet_id]['E'] = entities
+                self.wd[tweet_id]['B'] = entities
 
 
     # replace the keywords with the given pos tag types for all the tweets in a database
@@ -49,6 +49,8 @@ class PosDatabase:
         for t in pos_types:
             ret.extend(self.wd[tweet_id][t])
         lower_words = list(x.lower() for x in ret if len(x) > 2)
+        # strip the hashtag symbol
+        lower_words = [x.lstrip('#') for x in lower_words]
         return list(set(lower_words))
 
 

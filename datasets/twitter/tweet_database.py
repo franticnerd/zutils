@@ -118,7 +118,7 @@ class TweetDatabase:
 
     def trim_words_by_frequency(self, word_dict_file=None,
             freq_threshold=500000, infreq_threshold=1):
-        wd = self.gen_word_dict(word_dict_file)
+        wd = self.gen_word_dict(min_freq=infreq_threshold, output_file=word_dict_file)
         freq_words = wd.get_frequent_words(freq_threshold)
         infreq_words = wd.get_infrequent_words(infreq_threshold)
         stopwords = freq_words.union(infreq_words)
