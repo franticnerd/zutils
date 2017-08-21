@@ -1,10 +1,13 @@
 import operator
 from math import log
 from zutils.dto.st.grid import GridSpace
+from zutils.datasets.twitter.tweet_database import TweetDatabase
+import numpy as np
+
 
 class WordEntropyProcessor:
 
-    def __init__(self, tweet_database, grid_bin_list):
+    def __init__(self, tweet_database, grid_bin_list=[50,50,50]):
         self.td = tweet_database
         min_lat, max_lat = self.td.calc_lat_range()
         min_lng, max_lng = self.td.calc_lng_range()
@@ -38,12 +41,20 @@ class WordEntropyProcessor:
         cnt = 0
         for word, tweet_indices in self.inverted_index.items():
             # print word
-            # print tweet_indices
-            entropy = self.calc_word_entropy(tweet_indices)
+            # entropy = self.calc_word_entropy(tweet_indices)
+            entropy = self.calc_location_variance(tweet_indices)
             self.word_entropy_dict[word] = entropy
             cnt += 1
             if cnt % 100 == 0:
                 print cnt
+
+    def calc_location_variance(self, tweet_indices):
+        tweets = [self.td.tweets[i] for i in tweet_indices]
+        lats = [t.location.lat for t in tweets]
+        lngs = [t.location.lng for t in tweets]
+        lat_var = np.var(lats)
+        lng_var = np.var(lngs)
+        return - ( lat_var + lng_var )
 
 
     def rank_by_entropy(self):
@@ -54,12 +65,9 @@ class WordEntropyProcessor:
 
 
     def calc_word_entropy(self, tweet_indices, freq_thresh=40000):
-        dist = self.calc_word_distributions(tweet_indices)
-        frequency = dist.get_l1_norm()
-        # print frequency
-        # for k, v in dist.data.items():
-        #     print k, v
+        dist = self.count_tweets(tweet_indices)
         # KL divergence
+        frequency = dist.get_l1_norm()
         if frequency < freq_thresh:
             localness = log(frequency) - dist.get_entropy()
         else:
@@ -67,7 +75,7 @@ class WordEntropyProcessor:
         return localness
 
 
-    def calc_word_distributions(self, tweet_indices):
+    def count_tweets(self, tweet_indices):
         grid = GridSpace(self.grid_ranges, self.grid_bins)
         # print self.grid_ranges
         dist = Distribution()
@@ -130,6 +138,21 @@ class Distribution:
         self.data = copy.deepcopy(d)
         del self.data['L']
 
+    # # divergence from the uniform distribution
+    # def kl_from_uniform(self):
+    #     print 'Length before squeezing:', self.L
+    #     length = len(self.data)
+    #     uni = [1.0 / length] * length
+
 
 if __name__ == '__main__':
-    pass
+    data_file = '/Users/chao/data/source/tweets-100k/clean/tweets.txt'
+    td = TweetDatabase()
+    td.load_clean_tweets_from_file(data_file)
+    grid_bin_list = [50, 50, 50]
+    wep = WordEntropyProcessor(td, grid_bin_list)
+    word_entropy_file = '/Users/chao/data/source/tweets-100k/clean/concentration.txt'
+    wep.calc(word_entropy_file)
+    # activity_words = wep.select_top_words(activity_word_fraction)
+    # cwf = ContainWordFilter(activity_words)
+    # td.apply_one_filter(cwf)
